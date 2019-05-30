@@ -563,6 +563,50 @@ memtop(void)
 int
 getmeminfo(int pid, char* name, int len)
 {
-	cprintf("System call get memory infor is under implementation\n");
-	return 0;
+	int i;
+
+	struct proc *p;
+    acquire(&ptable.lock);
+	p = ptable.proc + pid;
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		if(p->pid == pid){
+			break;
+		}
+	}
+	if(p == &ptable.proc[NPROC]){
+		cprintf("pid: %d doesn't found in proc\n", pid);
+		return -1;
+	}
+
+	for(i=0; i<len; i++){
+		name[i] = p->name[i];
+	}
+	// Iterate through the page table
+
+	cprintf("Info: pid: %d, process memory: %d\n", p->pid, p->sz);
+
+	pde_t* pde;
+	pte_t *pgtab;
+	pte_t * pte;
+	// Iterate entries in pgdir, accumulated the valid entry
+	int allocated_mem = 0;
+	int idx_pde, idx_pte;
+	for(idx_pde=0; idx_pde < (1<<10); idx_pde++){
+		pde = &p->pgdir[idx_pde];
+
+		// If directory is valid
+		if(*pde & PTE_P){
+			pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
+
+			for(idx_pte=0; idx_pte < (1<<10); idx_pte++){
+			//for(pte = pgtab; pte < pgtab + PGSIZE; pte = pte + sizeof(pte_t)){
+				pte = &pgtab[idx_pte];
+				if(*pte & PTE_P){
+					allocated_mem += PGSIZE;
+				}
+			}
+		}
+	}
+    release(&ptable.lock);
+	return allocated_mem;
 }
