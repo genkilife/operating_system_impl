@@ -108,13 +108,17 @@ sys_getmeminfo(void)
 	int name_len = 16;
 	int allocated_mem = 0;
 	// execute in parent process
-	if(max_pid != 0){
-		for(iter_p = 1; iter_p <= max_pid; iter_p++){
-			memset(namebuf, 0, name_len);
-			allocated_mem = getmeminfo(iter_p, namebuf, name_len);
-			if(allocated_mem > 0){
-				cprintf("pid: %d, name: %s, mem: %d\n", iter_p, namebuf, allocated_mem);
-			}
+	if(max_pid == 0){
+		exit();
+	} else{
+		wait();
+	}
+
+	for(iter_p = 1; iter_p <= max_pid; iter_p++){
+		memset(namebuf, 0, name_len);
+		allocated_mem = getmeminfo(iter_p, namebuf, name_len);
+		if(allocated_mem > 0){
+			cprintf("pid: %d, name: %s, mem: %d\n", iter_p, namebuf, allocated_mem);
 		}
 	}
 	return 0;
