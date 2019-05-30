@@ -583,7 +583,7 @@ getmeminfo(int pid, char* name, int len)
 	}
 	// Iterate through the page table
 
-	cprintf("Info: pid: %d, process memory: %d\n", p->pid, p->sz);
+	cprintf("Proc info: pid: %d, process memory: %d\n", p->pid, p->sz);
 
 	pde_t* pde;
 	pte_t *pgtab;
@@ -591,9 +591,8 @@ getmeminfo(int pid, char* name, int len)
 	// Iterate entries in pgdir, accumulated the valid entry
 	int allocated_mem = 0;
 	int idx_pde, idx_pte;
-	for(idx_pde=0; idx_pde < (1<<10); idx_pde++){
+	for(idx_pde=0; idx_pde < (1<<9); idx_pde++){
 		pde = &p->pgdir[idx_pde];
-
 		// If directory is valid
 		if(*pde & PTE_P){
 			pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
