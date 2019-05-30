@@ -12,6 +12,16 @@ struct {
   struct proc proc[NPROC];
 } ptable;
 
+struct run {
+  struct run *next;
+};
+
+extern struct {
+  struct spinlock lock;
+  int use_lock;
+  struct run *freelist;
+} kmem;
+
 static struct proc *initproc;
 
 int nextpid = 1;
@@ -531,4 +541,21 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+memtop(void)
+{
+	int available_memory = 0;
+
+	// Calculate usable memory by iterating all kernel memory list
+	struct run* iter = kmem.freelist;
+	struct run* n;
+	while(iter != 0){
+		available_memory += PGSIZE;
+		n = (struct run*)iter->next;
+		iter = n;
+	}
+
+	return available_memory;
 }

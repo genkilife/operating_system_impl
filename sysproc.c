@@ -93,8 +93,5 @@ sys_uptime(void)
 int
 sys_memtop(void)
 {
-	// Need implementation
-	cprintf("TODO: implement memtop syscall");
-
-	return 0;
+	return memtop();
 }
