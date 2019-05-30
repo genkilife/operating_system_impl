@@ -89,3 +89,12 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_memtop(void)
+{
+	// Need implementation
+	cprintf("TODO: implement memtop syscall");
+
+	return 0;
+}
