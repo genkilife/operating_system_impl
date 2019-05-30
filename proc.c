@@ -559,3 +559,10 @@ memtop(void)
 
 	return available_memory;
 }
+
+int
+getmeminfo(int pid, char* name, int len)
+{
+	cprintf("System call get memory infor is under implementation\n");
+	return 0;
+}

@@ -121,6 +121,7 @@ int             wait(void);
 void            wakeup(void*);
 void            yield(void);
 int	            memtop(void);  
+int	            getmeminfo(int, char*, int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

@@ -93,5 +93,13 @@ sys_uptime(void)
 int
 sys_memtop(void)
 {
+	cprintf("sys_memtop is visited!!\n");
+	return memtop();
+}
+
+int
+sys_getmeminfo(void)
+{
+	cprintf("sys_getmeminfo is visited!!\n");
 	return memtop();
 }
