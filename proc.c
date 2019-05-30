@@ -574,6 +574,7 @@ getmeminfo(int pid, char* name, int len)
 		}
 	}
 	if(p == &ptable.proc[NPROC]){
+		release(&ptable.lock);
 		return -1;
 	}
 
