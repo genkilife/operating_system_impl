@@ -574,7 +574,6 @@ getmeminfo(int pid, char* name, int len)
 		}
 	}
 	if(p == &ptable.proc[NPROC]){
-		cprintf("pid: %d doesn't found in proc\n", pid);
 		return -1;
 	}
 
