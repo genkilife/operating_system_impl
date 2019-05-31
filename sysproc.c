@@ -93,31 +93,26 @@ sys_uptime(void)
 int
 sys_memtop(void)
 {
-	cprintf("sys_memtop is visited!!\n");
 	return memtop();
 }
 
 int
 sys_getmeminfo(void)
 {
-	cprintf("sys_getmeminfo is visited!!\n");
 	// Fetch all pil from ptables
-	int max_pid = fork();
 	int iter_p;
 	char namebuf[16];
 	int name_len = 16;
 	int allocated_mem = 0;
 	// execute in parent process
-	if(max_pid != 0){
-		for(iter_p = 1; iter_p <= max_pid; iter_p++){
-			memset(namebuf, 0, name_len);
-			allocated_mem = getmeminfo(iter_p, namebuf, name_len);
-			if(allocated_mem > 0){
-				cprintf("pid: %d, name: %s, mem: %d\n", iter_p, namebuf, allocated_mem);
-			}
+
+	for(iter_p = 1; iter_p < NPROC; iter_p++){
+		memset(namebuf, 0, name_len);
+		allocated_mem = getmeminfo(iter_p, namebuf, name_len);
+		if(allocated_mem > 0){
+			cprintf("pid: %d, name: %s, mem: %d\n", iter_p, namebuf, allocated_mem);
 		}
 	}
-	wait();
 
 	return 0;
 }

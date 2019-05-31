@@ -560,13 +560,26 @@ memtop(void)
 	return available_memory;
 }
 
+extern char data[];  // defined by kernel.ld
+static struct kmap {
+  void *virt;
+  uint phys_start;
+  uint phys_end;
+  int perm;
+} kmap[] = {
+ { (void*)KERNBASE, 0,             EXTMEM,    PTE_W}, // I/O space
+ { (void*)KERNLINK, V2P(KERNLINK), V2P(data), 0},     // kern text+rodata
+ { (void*)data,     V2P(data),     PHYSTOP,   PTE_W}, // kern data+memory
+ { (void*)DEVSPACE, DEVSPACE,      0,         PTE_W}, // more devices
+};
+
 int
 getmeminfo(int pid, char* name, int len)
 {
+
 	int i;
 
 	struct proc *p;
-    acquire(&ptable.lock);
 	p = ptable.proc + pid;
 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 		if(p->pid == pid){
@@ -574,7 +587,6 @@ getmeminfo(int pid, char* name, int len)
 		}
 	}
 	if(p == &ptable.proc[NPROC]){
-		release(&ptable.lock);
 		return -1;
 	}
 
@@ -583,33 +595,34 @@ getmeminfo(int pid, char* name, int len)
 	}
 	// Iterate through the page table
 
-	cprintf("Proc info: pid: %d, process memory: %d\n", p->pid, p->sz);
+	//cprintf("[Debug]proc info: pid: %d, process memory: %d, kernel stack: %x\n", p->pid, p->sz, p->kstack);
 
-	pde_t* pde;
-	pte_t *pgtab;
-	pte_t * pte;
+	pde_t* pde=0;
+	pde_t* pre_pde=0;
 	// Iterate entries in pgdir, accumulated the valid entry
-	int allocated_mem = NPDENTRIES * 4;
-	int idx_pde, idx_pte;
-	cprintf("pid: %d, pgdir address %x\n", p->pid, p->pgdir);
-	for(idx_pde=0; idx_pde < (1<<9); idx_pde++){
-		pde = &p->pgdir[idx_pde];
-		// If directory is valid
-		if(*pde & PTE_P){
-			allocated_mem += NPTENTRIES * 4;
-			pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
 
-			cprintf("pid: %d, pgtab address %x\n", p->pid, pgtab);
-			for(idx_pte=0; idx_pte < (1<<10); idx_pte++){
-			//for(pte = pgtab; pte < pgtab + PGSIZE; pte = pte + sizeof(pte_t)){
-				pte = &pgtab[idx_pte];
-				if(*pte & PTE_P){
-					cprintf("pid: %d, pte address %x\n", p->pid, pte);
-					allocated_mem += PGSIZE;
+	// Default pgdir page is 1 page.
+	int allocated_inter_mem = PGSIZE;
+	// Kernel stack allocate 1 page.
+	int allocated_kstack = PGSIZE;
+
+	struct kmap *k;
+	char* va=0;
+	uint sz;
+    for(k = kmap; k < &kmap[NELEM(kmap)]; k++){
+		for(sz = 0; sz < k->phys_end - k->phys_start; sz += PGSIZE){
+			va = (char*)PGROUNDDOWN((uint)k->virt + (uint)sz);
+			pde = &p->pgdir[PDX(va)];
+			if(pde != pre_pde){
+				if(*pde & PTE_P){
+					allocated_inter_mem += PGSIZE;
 				}
 			}
+			pre_pde = pde;
 		}
 	}
-    release(&ptable.lock);
-	return allocated_mem;
+
+	//cprintf("user page: %d, kernel intermediate page: %d, sum page: %d\n",p->sz, allocated_inter_mem, p->sz + allocated_inter_mem);
+
+	return p->sz + allocated_inter_mem + allocated_kstack;
 }
