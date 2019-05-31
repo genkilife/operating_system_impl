@@ -589,18 +589,22 @@ getmeminfo(int pid, char* name, int len)
 	pte_t *pgtab;
 	pte_t * pte;
 	// Iterate entries in pgdir, accumulated the valid entry
-	int allocated_mem = 0;
+	int allocated_mem = NPDENTRIES * 4;
 	int idx_pde, idx_pte;
+	cprintf("pid: %d, pgdir address %x\n", p->pid, p->pgdir);
 	for(idx_pde=0; idx_pde < (1<<9); idx_pde++){
 		pde = &p->pgdir[idx_pde];
 		// If directory is valid
 		if(*pde & PTE_P){
+			allocated_mem += NPTENTRIES * 4;
 			pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
 
+			cprintf("pid: %d, pgtab address %x\n", p->pid, pgtab);
 			for(idx_pte=0; idx_pte < (1<<10); idx_pte++){
 			//for(pte = pgtab; pte < pgtab + PGSIZE; pte = pte + sizeof(pte_t)){
 				pte = &pgtab[idx_pte];
 				if(*pte & PTE_P){
+					cprintf("pid: %d, pte address %x\n", p->pid, pte);
 					allocated_mem += PGSIZE;
 				}
 			}
