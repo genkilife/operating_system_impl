@@ -599,7 +599,30 @@ getmeminfo(int pid, char* name, int len)
 
 	pde_t* pde=0;
 	pde_t* pre_pde=0;
-	// Iterate entries in pgdir, accumulated the valid entry
+
+	pte_t *pgtab;
+	pte_t * pte;
+    // Iterate entries in user space
+
+	int allocated_user_mem = 0;
+	int idx_pde, idx_pte;
+	// Search user space
+	for(idx_pde=0; idx_pde < (1<<9); idx_pde++){
+		pde = &p->pgdir[idx_pde];
+		// If directory is valid
+		if(*pde & PTE_P){
+			allocated_user_mem += NPTENTRIES * 4;
+			pgtab = (pte_t*)P2V(PTE_ADDR(*pde));
+
+			for(idx_pte=0; idx_pte < (1<<10); idx_pte++){
+			//for(pte = pgtab; pte < pgtab + PGSIZE; pte = pte + sizeof(pte_t)){
+				pte = &pgtab[idx_pte];
+				if(*pte & PTE_P){
+					allocated_user_mem += PGSIZE;
+				}
+			}
+		}
+	}
 
 	// Default pgdir page is 1 page.
 	int allocated_inter_mem = PGSIZE;
@@ -622,7 +645,7 @@ getmeminfo(int pid, char* name, int len)
 		}
 	}
 
-	//cprintf("user page: %d, kernel intermediate page: %d, sum page: %d\n",p->sz, allocated_inter_mem, p->sz + allocated_inter_mem);
+	//cprintf("user page: %d, kernel intermediate page: %d\n",allocated_user_mem, allocated_inter_mem);
 
-	return p->sz + allocated_inter_mem + allocated_kstack;
+	return allocated_user_mem + allocated_inter_mem + allocated_kstack;
 }
