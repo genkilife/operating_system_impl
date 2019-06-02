@@ -22,13 +22,13 @@ extern struct {
   struct run *freelist;
 } kmem;
 
-static struct proc *initproc;
+struct proc *initproc;
 
 int nextpid = 1;
 extern void forkret(void);
 extern void trapret(void);
 
-static void wakeup1(void *chan);
+void wakeup1(void *chan);
 
 void
 pinit(void)
@@ -464,7 +464,7 @@ sleep(void *chan, struct spinlock *lk)
 //PAGEBREAK!
 // Wake up all processes sleeping on chan.
 // The ptable lock must be held.
-static void
+void
 wakeup1(void *chan)
 {
   struct proc *p;
