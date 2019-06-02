@@ -25,7 +25,7 @@ int sleep(int);
 int uptime(void);
 int memtop(void);
 int getmeminfo(void);
-int thread_create(void);
+int thread_create(void*, void*, void*);
 int thread_join(void);
 int thread_exit(void);
 
