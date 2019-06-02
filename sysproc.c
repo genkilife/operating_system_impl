@@ -140,11 +140,11 @@ sys_thread_create(void)
 int
 sys_thread_join(void)
 {
-	return 0;
+	return thread_join();
 }
 
 int
 sys_thread_exit(void)
 {
-	return 0;
+	return thread_exit();
 }
