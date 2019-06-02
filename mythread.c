@@ -12,6 +12,10 @@ int thread_create(void(*fcn)(void*), void *arg, void*stack){
 	return 0;
 }
 
+int thread_join(void){
+	return 0;
+}
+
 int thread_exit(void){
 	return 0;
 }
