@@ -8,7 +8,9 @@
 #include "spinlock.h"
 #include "mythread.h"
 
+extern struct proc* initproc;
 extern struct proc* allocproc(void);
+extern void wakeup1(void *);
 
 extern struct {
   struct spinlock lock;
@@ -70,5 +72,54 @@ int thread_join(void){
 }
 
 int thread_exit(void){
-	return 0;
+  // Port exit code to here and minor modify
+
+  struct proc *curproc = myproc();
+  struct proc *p;
+  int fd, fd_p;
+
+  if(curproc == initproc)
+    panic("init exiting");
+
+  // Close all open files.
+  p = curproc->parent;
+  for(fd = 0; fd < NOFILE; fd++){
+    if(curproc->ofile[fd]){
+      // If this file is not in parent's file descryptor
+      for(fd_p = 0; fd_p < NOFILE; fd_p++){
+        if(curproc->ofile[fd] == p->ofile[fd_p]){
+          break;
+        }
+      }
+      if(fd_p == NOFILE){
+        fileclose(curproc->ofile[fd]);
+        curproc->ofile[fd] = 0;
+      }
+    }
+  }
+
+  begin_op();
+  iput(curproc->cwd);
+  end_op();
+  curproc->cwd = 0;
+
+  acquire(&ptable.lock);
+
+  // Parent might be sleeping in wait().
+  wakeup1(curproc->parent);
+
+  // Pass abandoned children to init.
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->parent == curproc){
+      p->parent = initproc;
+      if(p->state == ZOMBIE)
+        wakeup1(initproc);
+    }
+  }
+
+  // Jump into the scheduler, never to return.
+  curproc->state = ZOMBIE;
+  sched();
+  panic("zombie exit");
+  return -1;
 }
