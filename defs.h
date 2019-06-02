@@ -123,6 +123,10 @@ void            yield(void);
 int	            memtop(void);  
 int	            getmeminfo(int, char*, int);
 
+// mythread.c
+int             thread_create(void(*)(void*), void *, void*);
+int             thread_exit(void);
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 
