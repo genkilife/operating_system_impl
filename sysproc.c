@@ -120,7 +120,21 @@ sys_getmeminfo(void)
 int
 sys_thread_create(void)
 {
-	return 0;
+  char *fcn;
+  char *arg;
+  char *stack;
+
+
+  if(argptr(0, &fcn, sizeof(uint)) < 0 || argptr(1, &arg, sizeof(uint)) < 0 || argptr(2, &stack, sizeof(uint)) < 0){
+    cprintf("Error: input argument can't be parsed in thread create syscall!/n");
+    return -1;
+  }
+
+  if(thread_create((void(*)(void*))fcn, arg, stack) < 0){
+    return -1;
+  }
+
+  return 0;
 }
 
 int
