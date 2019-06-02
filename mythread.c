@@ -31,7 +31,6 @@ int thread_create(void(*fcn)(void*), void *arg, void*stack){
 
   // Copy process state from proc.
   np->pgdir = curproc->pgdir;
-  np->kstack = curproc->kstack;
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
@@ -54,12 +53,11 @@ int thread_create(void(*fcn)(void*), void *arg, void*stack){
 
   release(&ptable.lock);
 
-  char* sp = (char*)stack + PGSIZE - sizeof(uint);
+  char* sp = (char*)stack + PGSIZE - 4;
   *(uint*)sp = (uint) arg;
-  sp -= sizeof(uint);
+  sp -= 4;
 
   *(uint*)sp = 0xffffffff; 
-  sp -= sizeof(uint);
 
   np->tf->esp = (uint) sp;
   np->tf->eip = (uint) fcn;
