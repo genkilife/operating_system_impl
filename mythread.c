@@ -68,6 +68,10 @@ int thread_create(void(*fcn)(void*), void *arg, void*stack){
 }
 
 int thread_join(void){
+
+    // if I have runnable child and it's parent is curprocess
+    // then we switch to other process
+
 	return 0;
 }
 
