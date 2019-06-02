@@ -33,7 +33,7 @@ void do_work(void *arg){
          //thread_spin_unlock(&lock);
     }
   
-    printf(1, "Done s:%x\n", b->name);
+    printf(1, "Done s:%s\n", b->name);
 
     thread_exit();
     return;
