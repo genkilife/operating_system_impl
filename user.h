@@ -1,5 +1,6 @@
 struct stat;
 struct rtcdate;
+struct thread_spinlock;
 
 // system calls
 int fork(void);
@@ -42,3 +43,8 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+
+// user function
+void thread_spin_init(struct thread_spinlock *lk);
+void thread_spin_lock(struct thread_spinlock *lk);
+void thread_spin_unlock(struct thread_spinlock *lk);
