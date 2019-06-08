@@ -39,10 +39,6 @@ void thread_spin_init(struct thread_spinlock *lk){
 }
 
 void thread_spin_lock(struct thread_spinlock *lk){
-  if(thread_holding(lk)){
-    exit();
-  }
-
   // The xchg is atomic.
   while(thread_xchg(&lk->locked, 1) != 0)
     ;
@@ -54,10 +50,6 @@ void thread_spin_lock(struct thread_spinlock *lk){
 }
 
 void thread_spin_unlock(struct thread_spinlock *lk){
-  if(!thread_holding(lk)){
-    exit();
-  }
-
   __sync_synchronize();
 
   // Release the lock, equivalent to lk->locked = 0.
