@@ -158,3 +158,12 @@ int thread_exit(void){
   panic("zombie exit");
   return -1;
 }
+
+int  sleep_and_release_mutex(void* cond, void* lock){
+  // save cond address into chan
+
+  // copy mutext release lock function, need to lock page table
+  // sleep and release page lock
+
+}
+
