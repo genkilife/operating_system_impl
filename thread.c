@@ -10,7 +10,8 @@ struct balance {
 
 volatile int total_balance = 0;
 
-struct thread_spinlock lock;
+struct thread_spinlock spin_lock;
+struct thread_spinlock mutex_lock;
 
 volatile unsigned int delay (unsigned int d) {
    unsigned int i; 
@@ -29,11 +30,11 @@ void do_work(void *arg){
     printf(1, "Starting do_work: s:%s\n", b->name);
 
     for (i = 0; i < b->amount; i++) { 
-         thread_spin_lock(&lock);
+         thread_spin_lock(&spin_lock);
          old = total_balance;
          delay(100000);
          total_balance = old + 1;
-         thread_spin_unlock(&lock);
+         thread_spin_unlock(&spin_lock);
     }
   
     printf(1, "Done s:%s\n", b->name);
