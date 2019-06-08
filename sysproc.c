@@ -166,3 +166,20 @@ sys_sleep_and_release_mutex(void){
 
   return 0;
 }
+
+int
+sys_user_cond_wakeup(void){
+
+  char* cond;
+
+  if(argptr(0, &cond, sizeof(char*)) < 0){
+    cprintf("Error: input argument can't be parsed in user cond wakeup!/n");
+    return -1;
+  }
+
+  if(user_cond_wakeup(cond) < 0){
+    return -1;
+  }
+
+  return 0;
+}

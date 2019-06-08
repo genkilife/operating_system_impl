@@ -194,3 +194,9 @@ int  sleep_and_release_mutex(void* cond, void* lock){
   return 0; 
 }
 
+int user_cond_wakeup(void* cond){
+  acquire(&ptable.lock);
+  wakeup1(cond);
+  release(&ptable.lock);
+  return 0;
+}

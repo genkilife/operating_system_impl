@@ -26,3 +26,4 @@
 #define SYS_thread_join   25
 #define SYS_thread_exit   26
 #define SYS_sleep_and_release_mutex   27
+#define SYS_user_cond_wakeup   28

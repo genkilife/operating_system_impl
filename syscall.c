@@ -109,6 +109,7 @@ extern int sys_thread_create(void);
 extern int sys_thread_join(void);
 extern int sys_thread_exit(void);
 extern int sys_sleep_and_release_mutex(void);
+extern int sys_user_cond_wakeup(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -138,6 +139,7 @@ static int (*syscalls[])(void) = {
 [SYS_thread_join]    sys_thread_join,
 [SYS_thread_exit]    sys_thread_exit,
 [SYS_sleep_and_release_mutex]  sys_sleep_and_release_mutex,
+[SYS_user_cond_wakeup] sys_user_cond_wakeup,
 };
 
 void

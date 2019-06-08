@@ -87,11 +87,11 @@ void thread_cond_init(struct thread_cond* cond){
 
 void thread_cond_signal(struct thread_cond* cond){
 	// wake up the process which holds the cond
+	// revert back the cond lock, this is handled in the sleep function
 
 	// We assume we must wake up a process
 	// Need to wait until the vairable is set
-
-	// revert back the cond lock
+	user_cond_wakeup(cond);
 }
 
 void thread_cond_wait(struct thread_cond* cond, struct thread_mutex* lk){
