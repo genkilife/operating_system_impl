@@ -48,3 +48,6 @@ int atoi(const char*);
 void thread_spin_init(struct thread_spinlock *lk);
 void thread_spin_lock(struct thread_spinlock *lk);
 void thread_spin_unlock(struct thread_spinlock *lk);
+
+uint thread_xchg(volatile uint *addr, uint newval);
+int thread_holding(struct thread_spinlock *lock);

@@ -14,6 +14,7 @@ struct thread_spinlock {
 };
 
 volatile int total_balance = 0;
+struct thread_spinlock lock;
 
 volatile unsigned int delay (unsigned int d) {
    unsigned int i; 
