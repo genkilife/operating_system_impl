@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
   t2 = thread_create(do_work, (void*)&b2, s2); 
 
   r1 = thread_join();
+  printf(1, "1 work %d merged\n", r1);
+
   r2 = thread_join();
   
   printf(1, "Threads finished: (%d):%d, (%d):%d, shared balance:%d\n", 
