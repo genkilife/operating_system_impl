@@ -30,32 +30,35 @@ int main(int argc, char *argv[]) {
   thread_mutex_init(&queue.m);
 
   struct Send_args send_args;
-  send_args.q = queue;
+  send_args.q = &queue;
   send_args.p = NULL;
 
   t1 = thread_create(send, (void*)&send_args, s1);
   t2 = thread_create(recv, (void*)&queue, s2); 
 
+  r1 = thread_join();
+  r2 = thread_join();
+
+  printf(1, "Threads finished: (%d):%d, (%d):%d\n", 
+      t1, r1, t2, r2);
   exit();
 }
 
 // Thread 1 (sender)
-void*
-send(struct Queue *q, void *p)
+void* send(struct Queue *q, void *p)
 {
    thread_mutex_lock(&q->m);
-   while(q->ptr != 0)
-      ;
+   while(q->ptr != 0);
    q->ptr = p;
    printf(1, "send: before signal condition variable\n");
    thread_cond_signal(&q->cv);
    thread_mutex_unlock(&q->m);
+   return p;
 }
 
 // Thread 2 (receiver)
 
-void*
-recv(struct Queue *q)
+void* recv(struct Queue *q)
 {
   void *p;
 
