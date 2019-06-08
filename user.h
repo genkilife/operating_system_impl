@@ -31,6 +31,7 @@ int getmeminfo(void);
 int thread_create(void*, void*, void*);
 int thread_join(void);
 int thread_exit(void);
+int sleep_and_release_mutex(void*, void*);
 
 // ulib.c
 int stat(const char*, struct stat*);

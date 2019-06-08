@@ -128,6 +128,8 @@ int             thread_create(void(*)(void*), void *, void*);
 int             thread_join(void);
 int             thread_exit(void);
 
+int             sleep_and_release_mutex(void*, void*);
+
 // swtch.S
 void            swtch(struct context**, struct context*);
 

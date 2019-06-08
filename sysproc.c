@@ -148,3 +148,21 @@ sys_thread_exit(void)
 {
 	return thread_exit();
 }
+
+int
+sys_sleep_and_release_mutex(void){
+
+  char* cond;
+  uint* lock;
+
+  if(argptr(0, &cond, sizeof(char*)) < 0 || argptr(1, &lock, sizeof(uint*)) < 0){
+    cprintf("Error: input argument can't be parsed in sleep and release mutex syscall!/n");
+    return -1;
+  }
+
+  if(sleep_and_release_mutex(cond, lock) < 0){
+    return -1;
+  }
+
+  return 0;
+}
