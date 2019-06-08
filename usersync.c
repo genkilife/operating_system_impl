@@ -101,11 +101,11 @@ void thread_cond_wait(struct thread_cond* cond, struct thread_mutex* lk){
 
 	// go to sleep
 
-  if (cond == NULL || *cond == NULL || cond->cond != THREAD_COND_INITIALIZER){
+  if (cond == NULL || cond->cond != THREAD_COND_INITIALIZER){
       return;
   }
 
-  sleep_and_release_mutex((void*)cond, (void*)lk->lock);
+  sleep_and_release_mutex((void*)cond, (void*)lk->locked);
 
   return;
 }

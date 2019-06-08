@@ -153,7 +153,7 @@ int
 sys_sleep_and_release_mutex(void){
 
   char* cond;
-  uint* lock;
+  char* lock;
 
   if(argptr(0, &cond, sizeof(char*)) < 0 || argptr(1, &lock, sizeof(uint*)) < 0){
     cprintf("Error: input argument can't be parsed in sleep and release mutex syscall!/n");
