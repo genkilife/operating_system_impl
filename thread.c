@@ -1,19 +1,15 @@
 #include "types.h"
 #include "stat.h"
 #include "user.h"
+#include "usersync.h"
 
 struct balance {
     char name[32];
     int amount;
 };
 
-struct thread_spinlock {
-  uint locked;       // Is the lock held?
-  // For debugging:
-  char *name;        // Name of lock.
-};
-
 volatile int total_balance = 0;
+
 struct thread_spinlock lock;
 
 volatile unsigned int delay (unsigned int d) {
