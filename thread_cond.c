@@ -63,7 +63,7 @@ recv(struct Queue *q)
 
   while((p = q->ptr) == 0){
     printf(1, "recv: before waiting condition variable\n");
-    pthread_cond_wait(&q->cv, &q->m);
+    thread_cond_wait(&q->cv, &q->m);
     printf(1, "recv: after recieve condition variable\n");
   }
   q->ptr = 0;
