@@ -5,4 +5,10 @@ struct thread_spinlock {
   // For debugging:
   char name[32];        // Name of lock.
 };
+
+struct thread_mutex {
+  uint locked;       // Is the lock held?
+  // For debugging:
+  char name[32];        // Name of lock.
+};
 #endif

@@ -4,12 +4,7 @@
 #include "user.h"
 #include "x86.h"
 #include "spinlock.h"
-
-struct thread_spinlock {
-  uint locked;       // Is the lock held?
-  // For debugging:
-  char name[32];        // Name of lock.
-};
+#include "usersync.h"
 
 uint thread_xchg(volatile uint *addr, uint newval)
 {
@@ -50,6 +45,34 @@ void thread_spin_lock(struct thread_spinlock *lk){
 }
 
 void thread_spin_unlock(struct thread_spinlock *lk){
+  __sync_synchronize();
+
+  // Release the lock, equivalent to lk->locked = 0.
+  // This code can't use a C assignment, since it might
+  // not be atomic. A real OS would use C atomics here.
+  asm volatile("movl $0, %0" : "+m" (lk->locked) : );
+}
+
+void thread_mutex_init(struct thread_mutex *lk){
+  char name[32] = "user_thread_lock";
+  for(int i=0; i<32; i++){
+    lk->name[i] = name[i];
+  }
+  lk->locked = 0;
+}
+
+void thread_mutex_lock(struct thread_mutex *lk){
+  while(thread_xchg(&lk->locked, 1) != 0){
+    sleep(1);
+  }
+
+  // Tell the C compiler and the processor to not move loads or stores
+  // past this point, to ensure that the critical section's memory
+  // references happen after the lock is acquired.
+  __sync_synchronize();
+}
+
+void thread_mutex_unlock(struct thread_mutex *lk){
   __sync_synchronize();
 
   // Release the lock, equivalent to lk->locked = 0.
