@@ -2,6 +2,7 @@ struct stat;
 struct rtcdate;
 struct thread_spinlock;
 struct thread_mutex;
+struct thread_cond;
 
 // system calls
 int fork(void);
@@ -46,13 +47,21 @@ void free(void*);
 int atoi(const char*);
 
 // user function
+
+// Spinlock
 void thread_spin_init(struct thread_spinlock *lk);
 void thread_spin_lock(struct thread_spinlock *lk);
 void thread_spin_unlock(struct thread_spinlock *lk);
 
+// Mutex
 void thread_mutex_init(struct thread_mutex *lk);
 void thread_mutex_lock(struct thread_mutex *lk);
 void thread_mutex_unlock(struct thread_mutex *lk);
 
 uint thread_xchg(volatile uint *addr, uint newval);
 int thread_holding(struct thread_spinlock *lock);
+
+// Condition variable
+void thread_cond_init(struct thread_cond*);
+void thread_cond_signal(struct thread_cond*);
+void thread_cond_wait(struct thread_cond*, struct thread_mutex*);

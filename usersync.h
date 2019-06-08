@@ -11,4 +11,8 @@ struct thread_mutex {
   // For debugging:
   char name[32];        // Name of lock.
 };
+
+struct thread_cond {
+  uint cond;
+};
 #endif

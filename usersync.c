@@ -81,3 +81,14 @@ void thread_mutex_unlock(struct thread_mutex *lk){
   asm volatile("movl $0, %0" : "+m" (lk->locked) : );
 }
 
+void thread_cond_init(struct thread_cond* cond){
+  cond->cond = 0;
+}
+
+void thread_cond_signal(struct thread_cond* cond){
+
+}
+
+void thread_cond_wait(struct thread_cond* cond, struct thread_mutex* lk){
+
+}
