@@ -161,9 +161,36 @@ int thread_exit(void){
 
 int  sleep_and_release_mutex(void* cond, void* lock){
   // save cond address into chan
+  struct proc *p = myproc();
+  
+  if(p == 0)
+    panic("sleep");
 
-  // copy mutext release lock function, need to lock page table
-  // sleep and release page lock
+  if(lock == 0)
+    panic("sleep without lock");
 
+  // so it's okay to release lk.
+  if(lock == &ptable.lock)
+    panic("mutex locks is not page table lock");
+
+  acquire(&ptable.lock);  //DOC: sleeplock1
+
+  // release(lock);
+  asm volatile("movl $0, %0" : "+m" (lock) : );
+
+
+  // Go to sleep.
+  p->chan = cond;
+  p->state = SLEEPING;
+
+  sched();
+
+  // Tidy up.
+  p->chan = 0;
+
+  //acquire(lk);
+  while(xchg(lock, 1) !=0);
+ 
+  return 0; 
 }
 
