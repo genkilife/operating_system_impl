@@ -58,7 +58,7 @@ void thread_mutex_init(struct thread_mutex *lk){
   for(int i=0; i<32; i++){
     lk->name[i] = name[i];
   }
-  lk->locked = 0;
+  lk->locked = MUTEX_INITIALIZER;
 }
 
 void thread_mutex_lock(struct thread_mutex *lk){
@@ -82,13 +82,30 @@ void thread_mutex_unlock(struct thread_mutex *lk){
 }
 
 void thread_cond_init(struct thread_cond* cond){
-  cond->cond = 0;
+  cond->cond = THREAD_COND_INITIALIZER;
 }
 
 void thread_cond_signal(struct thread_cond* cond){
+	// wake up the process which holds the cond
 
+	// We assume we must wake up a process
+	// Need to wait until the vairable is set
+
+	// revert back the cond lock
 }
 
 void thread_cond_wait(struct thread_cond* cond, struct thread_mutex* lk){
+	// setup condition variable
 
+	// release lock
+
+	// go to sleep
+
+  if (cond == NULL || *cond == NULL || cond->cond != THREAD_COND_INITIALIZER){
+      return;
+  }
+
+  sleep_and_release_mutex((void*)cond, (void*)lk->lock);
+
+  return;
 }
