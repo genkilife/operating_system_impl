@@ -259,7 +259,7 @@ iappend(uint inum, void *xp, int n)
   uint fbn, off, n1;
   struct dinode din;
   char buf[BSIZE];
-  uint indirect[NINDIRECT];
+  uint indirect[BLOCKSIZE+1];
   uint x;
   uint pre_addr=0;
   uint counter=0;
@@ -284,7 +284,7 @@ iappend(uint inum, void *xp, int n)
 	    indirect[BLOCKSIZE] = xint(freeblock++); 
 	    wsect(xint(pre_addr), (char*)indirect);
 	  }
-      pre_addr = xint(indirect[counter]);
+      pre_addr = xint(indirect[BLOCKSIZE]);
       counter -= BLOCKSIZE;
       rsect(pre_addr, (char*)indirect);
     }
