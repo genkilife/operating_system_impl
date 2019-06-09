@@ -301,7 +301,6 @@ iappend(uint inum, void *xp, int n)
     n -= n1;
     off += n1;
     p += n1;
-    counter++;
   }
   din.size = xint(off);
   winode(inum, &din);
