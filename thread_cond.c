@@ -14,8 +14,8 @@ struct Send_args{
   void* p;
 };
 
-void* send(struct Send_args*);
-void* recv(struct Queue *q);
+void send(struct Send_args*);
+void recv(struct Queue *q);
 
 int main(int argc, char *argv[]) {
 
