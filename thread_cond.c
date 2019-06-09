@@ -14,7 +14,7 @@ struct Send_args{
   void* p;
 };
 
-void* send(struct Queue *q, void *p);
+void* send(struct Send_args*);
 void* recv(struct Queue *q);
 
 int main(int argc, char *argv[]) {
@@ -28,13 +28,17 @@ int main(int argc, char *argv[]) {
   // Initialize
   thread_cond_init(&queue.cv);
   thread_mutex_init(&queue.m);
+  queue.ptr = NULL;
 
   struct Send_args send_args;
   send_args.q = &queue;
   send_args.p = NULL;
 
-  t1 = thread_create(send, (void*)&send_args, s1);
   t2 = thread_create(recv, (void*)&queue, s2); 
+
+  t1 = thread_create(send, (void*)&send_args, s1);
+
+  printf(1, "send pid: %d, recv pid: %d\n", t1, t2);
 
   r1 = thread_join();
   r2 = thread_join();
@@ -45,8 +49,11 @@ int main(int argc, char *argv[]) {
 }
 
 // Thread 1 (sender)
-void* send(struct Queue *q, void *p)
+void* send(struct Send_args* args)
 {
+   struct Queue *q = args->q;
+   void *p = args->p;
+
    thread_mutex_lock(&q->m);
    while(q->ptr != 0);
    q->ptr = p;
