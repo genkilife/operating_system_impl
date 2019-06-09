@@ -269,22 +269,22 @@ iappend(uint inum, void *xp, int n)
   // printf("append inum %d at off %d sz %d\n", inum, off, n);
 
   ////////
-  fbn = off / BSIZE;
-  assert(fbn < MAXFILE);
 
   if(xint(din.addrs[0]) == 0){
     din.addrs[0] = pre_addr = xint(freeblock++);
     counter = 0;
-    rsect(pre_addr, (char*)indirect);
+    rsect(din.addrs[0], (char*)indirect);
   }
 
   while(n > 0){
+    fbn = off / BSIZE;
+    assert(fbn < MAXFILE);
     if(xint(indirect[counter]) == 0){
       indirect[counter] = xint(freeblock++); 
       wsect(xint(pre_addr), (char*)indirect);
     }
     if(counter == BLOCKSIZE){
-      pre_addr = indirect[counter];
+      pre_addr = xint(indirect[counter]);
       counter = 0;
       rsect(pre_addr, (char*)indirect);
       continue;
