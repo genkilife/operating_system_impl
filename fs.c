@@ -376,28 +376,36 @@ bmap(struct inode *ip, uint bn)
   uint addr, *a;
   struct buf *bp;
 
-  if(bn < NDIRECT){
-    if((addr = ip->addrs[bn]) == 0)
-      ip->addrs[bn] = addr = balloc(ip->dev);
-    return addr;
+  if((addr = ip->addrs[0]) == 0){
+    ip->addrs[0] = addr = balloc(ip->dev);
   }
-  bn -= NDIRECT;
+  // addr keeps the address to 1st block
 
-  if(bn < NINDIRECT){
-    // Load indirect block, allocating if necessary.
-    if((addr = ip->addrs[NDIRECT]) == 0)
-      ip->addrs[NDIRECT] = addr = balloc(ip->dev);
-    bp = bread(ip->dev, addr);
-    a = (uint*)bp->data;
-    if((addr = a[bn]) == 0){
-      a[bn] = addr = balloc(ip->dev);
+  // get 1st block
+  bp = bread(ip->dev, addr);
+  a = (uint*)bp->data;
+  while(bn > BLOCKSIZE){
+    if((addr=a[BLOCKSIZE]) == 0){
+      a[BLOCKSIZE] = addr = balloc(ip->dev);
       log_write(bp);
     }
+    // addr is now assigned to a[BLOCKSIZE];
+
+    // release current block buffer
     brelse(bp);
-    return addr;
+
+    // read next block
+    bp = bread(ip->dev, addr);
+    a = (uint*)bp->data;
+    bn -= BLOCKSIZE;
   }
 
-  panic("bmap: out of range");
+  if((addr=a[bn] == 0)){
+    a[bn] = addr = balloc(ip->dev);
+    log_write(bp);
+  }
+  brelse(bp);
+  return addr;
 }
 
 // Truncate inode (discard contents).
