@@ -166,7 +166,7 @@ int  sleep_and_release_mutex(void* cond, void* lock){
   if(p == 0)
     panic("sleep");
 
-  if(lock == 0)
+  if(*(int*)lock == 0)
     panic("sleep without lock");
 
   // so it's okay to release lk.
@@ -176,7 +176,7 @@ int  sleep_and_release_mutex(void* cond, void* lock){
   acquire(&ptable.lock);  //DOC: sleeplock1
 
   // release(lock);
-  asm volatile("movl $0, %0" : "+m" (lock) : );
+  asm volatile("movl $0, %0" : "+m" (*(int*)lock) : );
 
 
   // Go to sleep.
@@ -184,6 +184,7 @@ int  sleep_and_release_mutex(void* cond, void* lock){
   p->state = SLEEPING;
 
   sched();
+  release(&ptable.lock);  //DOC: sleeplock1
 
   // Tidy up.
   p->chan = 0;
