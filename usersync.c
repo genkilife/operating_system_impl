@@ -105,7 +105,7 @@ void thread_cond_wait(struct thread_cond* cond, struct thread_mutex* lk){
       return;
   }
 
-  sleep_and_release_mutex((void*)cond, (void*)lk->locked);
+  sleep_and_release_mutex((void*)cond, (void*)&lk->locked);
 
   return;
 }
