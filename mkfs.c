@@ -279,7 +279,7 @@ iappend(uint inum, void *xp, int n)
   }
 
   while(n > 0){
-    if(indirect[counter] == 0){
+    if(xint(indirect[counter]) == 0){
       indirect[counter] = xint(freeblock++); 
       wsect(xint(pre_addr), (char*)indirect);
     }
@@ -290,13 +290,11 @@ iappend(uint inum, void *xp, int n)
       continue;
     }
 
-    x = indirect[counter];
-
+    x = xint(indirect[counter]);
     n1 = min(n, (fbn + 1) * BSIZE - off);
     rsect(x, buf);
     bcopy(p, buf + off - (fbn * BSIZE), n1);
     wsect(x, buf);
-
     n -= n1;
     off += n1;
     p += n1;

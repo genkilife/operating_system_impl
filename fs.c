@@ -373,20 +373,20 @@ iunlockput(struct inode *ip)
 static uint
 bmap(struct inode *ip, uint bn)
 {
-  uint addr, *a;
+  uint *a;
   struct buf *bp;
 
-  if((addr = ip->addrs[0]) == 0){
-    ip->addrs[0] = addr = balloc(ip->dev);
+  if((ip->addrs[0]) == 0){
+    ip->addrs[0] = balloc(ip->dev);
   }
   // addr keeps the address to 1st block
 
   // get 1st block
-  bp = bread(ip->dev, addr);
+  bp = bread(ip->dev, ip->addrs[0]);
   a = (uint*)bp->data;
   while(bn > BLOCKSIZE){
-    if((addr=a[BLOCKSIZE]) == 0){
-      a[BLOCKSIZE] = addr = balloc(ip->dev);
+    if(a[BLOCKSIZE] == 0){
+      a[BLOCKSIZE] = balloc(ip->dev);
       log_write(bp);
     }
     // addr is now assigned to a[BLOCKSIZE];
@@ -395,17 +395,17 @@ bmap(struct inode *ip, uint bn)
     brelse(bp);
 
     // read next block
-    bp = bread(ip->dev, addr);
+    bp = bread(ip->dev, a[BLOCKSIZE]);
     a = (uint*)bp->data;
     bn -= BLOCKSIZE;
   }
 
-  if((addr=a[bn]) == 0){
-    a[bn] = addr = balloc(ip->dev);
+  if(a[bn] == 0){
+    a[bn] = balloc(ip->dev);
     log_write(bp);
   }
   brelse(bp);
-  return addr;
+  return a[bn];
 }
 
 // Truncate inode (discard contents).
