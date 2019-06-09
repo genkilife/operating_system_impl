@@ -275,20 +275,23 @@ iappend(uint inum, void *xp, int n)
     counter = 0;
     rsect(din.addrs[0], (char*)indirect);
   }
-
   while(n > 0){
     fbn = off / BSIZE;
     assert(fbn < MAXFILE);
-    if(xint(indirect[counter]) == 0){
-      indirect[counter] = xint(freeblock++); 
-      wsect(xint(pre_addr), (char*)indirect);
-    }
-    if(counter == BLOCKSIZE){
+    counter = fbn;
+    while(counter >= BLOCKSIZE){
+	  if(xint(indirect[BLOCKSIZE]) == 0){
+	    indirect[BLOCKSIZE] = xint(freeblock++); 
+	    wsect(xint(pre_addr), (char*)indirect);
+	  }
       pre_addr = xint(indirect[counter]);
-      counter = 0;
+      counter -= BLOCKSIZE;
       rsect(pre_addr, (char*)indirect);
-      continue;
     }
+	if(xint(indirect[counter]) == 0){
+	  indirect[counter] = xint(freeblock++); 
+	  wsect(xint(pre_addr), (char*)indirect);
+	}
 
     x = xint(indirect[counter]);
     n1 = min(n, (fbn + 1) * BSIZE - off);
