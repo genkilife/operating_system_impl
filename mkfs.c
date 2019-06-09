@@ -271,10 +271,10 @@ iappend(uint inum, void *xp, int n)
   ////////
 
   if(xint(din.addrs[0]) == 0){
-    din.addrs[0] = pre_addr = xint(freeblock++);
-    counter = 0;
-    rsect(din.addrs[0], (char*)indirect);
+    din.addrs[0] = xint(freeblock++);
   }
+  rsect(din.addrs[0], (char*)indirect);
+  pre_addr = din.addrs[0];
   while(n > 0){
     fbn = off / BSIZE;
     assert(fbn < MAXFILE);
