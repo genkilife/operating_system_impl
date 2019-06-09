@@ -400,7 +400,7 @@ bmap(struct inode *ip, uint bn)
     bn -= BLOCKSIZE;
   }
 
-  if((addr=a[bn] == 0)){
+  if((addr=a[bn]) == 0){
     a[bn] = addr = balloc(ip->dev);
     log_write(bp);
   }
