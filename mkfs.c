@@ -261,36 +261,46 @@ iappend(uint inum, void *xp, int n)
   char buf[BSIZE];
   uint indirect[NINDIRECT];
   uint x;
+  uint pre_addr=0;
+  uint counter=0;
 
   rinode(inum, &din);
   off = xint(din.size);
   // printf("append inum %d at off %d sz %d\n", inum, off, n);
+
+  ////////
+  fbn = off / BSIZE;
+  assert(fbn < MAXFILE);
+
+  if(xint(din.addrs[0]) == 0){
+    din.addrs[0] = pre_addr = xint(freeblock++);
+    counter = 0;
+    rsect(pre_addr, (char*)indirect);
+  }
+
   while(n > 0){
-    fbn = off / BSIZE;
-    assert(fbn < MAXFILE);
-    if(fbn < NDIRECT){
-      if(xint(din.addrs[fbn]) == 0){
-        din.addrs[fbn] = xint(freeblock++);
-      }
-      x = xint(din.addrs[fbn]);
-    } else {
-      if(xint(din.addrs[NDIRECT]) == 0){
-        din.addrs[NDIRECT] = xint(freeblock++);
-      }
-      rsect(xint(din.addrs[NDIRECT]), (char*)indirect);
-      if(indirect[fbn - NDIRECT] == 0){
-        indirect[fbn - NDIRECT] = xint(freeblock++);
-        wsect(xint(din.addrs[NDIRECT]), (char*)indirect);
-      }
-      x = xint(indirect[fbn-NDIRECT]);
+    if(indirect[counter] == 0){
+      indirect[counter] = xint(freeblock++); 
+      wsect(xint(pre_addr), (char*)indirect);
     }
+    if(counter == BLOCKSIZE){
+      pre_addr = indirect[counter];
+      counter = 0;
+      rsect(pre_addr, (char*)indirect);
+      continue;
+    }
+
+    x = indirect[counter];
+
     n1 = min(n, (fbn + 1) * BSIZE - off);
     rsect(x, buf);
     bcopy(p, buf + off - (fbn * BSIZE), n1);
     wsect(x, buf);
+
     n -= n1;
     off += n1;
     p += n1;
+    counter++;
   }
   din.size = xint(off);
   winode(inum, &din);
