@@ -130,11 +130,7 @@ sys_thread_create(void)
     return -1;
   }
 
-  if(thread_create((void(*)(void*))fcn, arg, stack) < 0){
-    return -1;
-  }
-
-  return 0;
+  return thread_create((void(*)(void*))fcn, arg, stack);
 }
 
 int
@@ -160,11 +156,7 @@ sys_sleep_and_release_mutex(void){
     return -1;
   }
 
-  if(sleep_and_release_mutex(cond, lock) < 0){
-    return -1;
-  }
-
-  return 0;
+  return sleep_and_release_mutex(cond, lock);
 }
 
 int
@@ -177,9 +169,5 @@ sys_user_cond_wakeup(void){
     return -1;
   }
 
-  if(user_cond_wakeup(cond) < 0){
-    return -1;
-  }
-
-  return 0;
+  return user_cond_wakeup(cond);
 }
